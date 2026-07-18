@@ -47,6 +47,7 @@ import net.neoforged.neoforge.event.level.BlockEvent;
 import net.neoforged.neoforge.event.level.PistonEvent;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.IFluidHandlerItem;
+import net.skds.wpo.api.FlowBias;
 import net.skds.wpo.api.IWPOFluidPassage;
 import net.skds.wpo.api.WPOPassageDecision;
 import net.skds.wpo.WPOConfig;
@@ -192,35 +193,6 @@ public class FFluidStatic {
 
 	// ================ OTHER ================== //
 
-	public static Vec3 getVel2(BlockGetter w, BlockPos posV, FluidState state) {
-
-		Vec3 vel = new Vec3(0, 0, 0);
-		int level = state.getAmount();
-		Iterator<Direction> iter = Direction.Plane.HORIZONTAL.iterator();
-
-		while (iter.hasNext()) {
-			Direction dir = (Direction) iter.next();
-			BlockPos pos2 = posV.relative(dir);
-
-			BlockState st = w.getBlockState(pos2);
-			FluidState fluidState = st.getFluidState();
-			if (!fluidState.isEmpty() && canReach(w, posV, dir.getOpposite())) {
-				int lvl0 = fluidState.getAmount();
-				FluidState f2 = w.getFluidState(pos2.above());
-				if (isSameFluid(state.getType(), f2.getType())) {
-					lvl0 += f2.getAmount();
-				}
-				int delta = level - lvl0;
-				if (delta > 1 || delta < -1) {
-					Vec3i v3i = dir.getNormal();
-					vel = vel.add(v3i.getX() * delta, 0, v3i.getZ() * delta);
-				}
-			}
-			// vel.multiply((double) 1D/n);
-		}
-		return vel.normalize();
-	}
-
 	public static Vec3 getVel(BlockGetter w, BlockPos pos, FluidState fs) {
 
 		Vec3 vel = new Vec3(0, 0, 0);
@@ -260,7 +232,28 @@ public class FFluidStatic {
 			}
 			// vel.multiply((double) 1D/n);
 		}
-		return vel.normalize();
+		// vel accumulates raw per-voxel level deltas, not just direction - scale toward
+		// max fluid level rather than normalizing to unit length. Otherwise a single
+		// barely-qualifying delta (deadzone is |delta|>1) reports the same full-strength
+		// magnitude as a max-level waterfall drop, and always outvotes a real river bias
+		// (typically well under 1.0 strength) regardless of how minor the local difference
+		// actually was.
+		Vec3 base = vel.lengthSqr() > 0.0D ? vel.scale(1.0D / WPOConfig.MAX_FLUID_LEVEL) : vel;
+		if (base.lengthSqr() > 1.0D) {
+			base = base.normalize();
+		}
+		FlowBias.Bias bias = FlowBias.at(w, pos, fs);
+		// Gate on the vector, not the cardinal direction - a bias may carry a smoothed
+		// vector with no committed direction (see FlowBias.Bias).
+		if (!(bias.strength() > 0.0D) || (bias.vecX() == 0.0D && bias.vecZ() == 0.0D)) {
+			return base;
+		}
+		Vec3 biasVec = new Vec3(bias.vecX() * bias.strength(), 0.0D, bias.vecZ() * bias.strength());
+		if (base.lengthSqr() <= 0.0D) {
+			return biasVec;
+		}
+		Vec3 combined = base.add(biasVec);
+		return combined.lengthSqr() > 1.0D ? combined.normalize() : combined;
 	}
 
 	// ================ RENDERER ================== //

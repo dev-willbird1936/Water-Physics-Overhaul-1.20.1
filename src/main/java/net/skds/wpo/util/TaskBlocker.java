@@ -1,11 +1,12 @@
 package net.skds.wpo.util;
 
 import net.minecraft.core.BlockPos;
+import net.skds.core.multithreading.ThreadProvider;
 import net.skds.wpo.fluidphysics.FluidTask;
 
 public class TaskBlocker {
 
-	private static FluidTask[] blockMap = new FluidTask[4];
+	private static FluidTask[] blockMap = new FluidTask[ThreadProvider.MAX_WORKERS];
 
 	public static void finish(int i) {
 		blockMap[i] = null;

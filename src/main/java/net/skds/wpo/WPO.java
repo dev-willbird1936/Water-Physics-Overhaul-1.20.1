@@ -15,6 +15,8 @@ import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.common.NeoForge;
+import net.skds.core.multithreading.MTHooks;
+import net.skds.wpo.fluidphysics.WorldWorkSet;
 import net.skds.wpo.network.PacketHandler;
 import net.skds.wpo.registry.BlockStateProps;
 import net.skds.wpo.registry.Entities;
@@ -37,7 +39,8 @@ public class WPO
         modBus.addListener(this::setup);
 
         NeoForge.EVENT_BUS.register(EVENTS);
-      
+        MTHooks.registerTaskSource(WorldWorkSet::nextTask);
+
         WPOConfig.init(container);
         WPODataComponents.register(modBus);
         Items.register(modBus);

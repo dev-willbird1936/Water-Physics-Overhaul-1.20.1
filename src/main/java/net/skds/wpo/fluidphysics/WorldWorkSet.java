@@ -85,7 +85,7 @@ public class WorldWorkSet implements IWWS {
 	}
 
 	public static ITaskRunnable nextTask(int i) {
-		if (i > 3) {
+		if (i < 0 || i >= net.skds.core.multithreading.ThreadProvider.MAX_WORKERS) {
 			return null;
 		}
 		if (MTHooks.COUNTS > 0 || Events.getRemainingTickTimeMilis() > MTHooks.TIME) {

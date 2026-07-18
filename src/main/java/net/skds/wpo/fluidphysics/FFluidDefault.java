@@ -12,6 +12,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.skds.core.api.IWWSG;
 import net.skds.wpo.WPOConfig;
+import net.skds.wpo.api.FlowBias;
 
 public class FFluidDefault extends FFluidBasic {
 
@@ -158,7 +159,7 @@ public class FFluidDefault extends FFluidBasic {
 			state = getUpdatedState(state, level);
 			int r = -1;
 			if (d > 0) {
-				r = w.getRandom().nextInt(c);
+				r = biasedRemainderIndex(c);
 			}
 
 			i = 0;
@@ -207,6 +208,28 @@ public class FFluidDefault extends FFluidBasic {
 
 			new FFluidEQ(w, pos, castOwner, FFluidBasic.Mode.EQUALIZER, worker).run();
 		}
+	}
+
+	// Gives the flow remainder to the neighbor matching an active FlowBias (e.g. a river
+	// current) when one covers a gathered neighbor; falls back to the original random pick.
+	private int biasedRemainderIndex(int c) {
+		Direction biasDir = FlowBias.at(w, pos, fs).direction();
+		if (biasDir != null) {
+			int idx = 0;
+			int seen = 0;
+			Iterator<Direction> dirs = Direction.Plane.HORIZONTAL.iterator();
+			while (dirs.hasNext()) {
+				Direction dir = dirs.next();
+				if (nbc[idx]) {
+					if (dir == biasDir) {
+						return seen;
+					}
+					++seen;
+				}
+				++idx;
+			}
+		}
+		return w.getRandom().nextInt(c);
 	}
 
 	private void reset(int level2) {

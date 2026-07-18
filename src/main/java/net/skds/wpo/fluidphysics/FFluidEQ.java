@@ -11,6 +11,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
 import net.minecraft.server.level.ServerLevel;
 import net.skds.wpo.WPOConfig;
+import net.skds.wpo.api.FlowBias;
 
 public class FFluidEQ extends FFluidBasic {
 
@@ -31,7 +32,10 @@ public class FFluidEQ extends FFluidBasic {
 		// boolean slide = false;
 		// setState(pos.add(0, 16, 0), Blocks.STONE.getDefaultState());
 		boolean slided = false;
-		int i0 = w.getRandom().nextInt(4);
+		// Try the current's direction first when a FlowBias is active (equalizeLine returns
+		// as soon as one direction succeeds, so trying order is what actually matters here).
+		Direction biasDir = FlowBias.at(w, pos, fs).direction();
+		int i0 = biasDir != null ? biasDir.get2DDataValue() : w.getRandom().nextInt(4);
 		if (slide && !canReach(pos, pos.below(), state, getBlockState(pos.below())) && level == 1) {
 			slided = slide();
 		}

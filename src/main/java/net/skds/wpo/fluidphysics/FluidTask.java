@@ -53,10 +53,6 @@ public abstract class FluidTask implements ITaskRunnable {
 			if (owner.excludedTasks.contains(pos)) {
 				return;
 			}
-			//Events.c++;
-			
-			//System.out.println(BlockPos.fromLong(pos));
-			//FFluidDefaultV2 t = new FFluidDefaultV2(owner.world, BlockPos.fromLong(pos), owner, FFluidBasic.Mode.DEFAULT);
 			FFluidDefault t = new FFluidDefault(owner.world, BlockPos.of(pos), owner, FFluidBasic.Mode.DEFAULT, worker);
 			t.run();
 			if (worker != -1) {
@@ -74,8 +70,6 @@ public abstract class FluidTask implements ITaskRunnable {
 
 		@Override
 		public void run() {
-			//System.out.println(BlockPos.fromLong(pos));
-			//FFluidEQV2 t = new FFluidEQV2(owner.world, BlockPos.fromLong(pos), owner, FFluidBasic.Mode.DEFAULT);
 			FFluidEQ t = new FFluidEQ(owner.world, BlockPos.of(pos), owner, FFluidBasic.Mode.EQUALIZER, worker);
 			t.run();
 			if (worker != -1) {
