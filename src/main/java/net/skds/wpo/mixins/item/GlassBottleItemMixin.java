@@ -25,7 +25,7 @@ public class GlassBottleItemMixin {
 
 	}
 
-	@Inject(method = "use", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;playSound(Lnet/minecraft/world/entity/player/Player;DDDLnet/minecraft/sounds/SoundEvent;Lnet/minecraft/sounds/SoundSource;FF)V"), cancellable = true)
+	@Inject(method = "use", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;playSound(Lnet/minecraft/world/entity/player/Player;DDDLnet/minecraft/sounds/SoundEvent;Lnet/minecraft/sounds/SoundSource;FF)V", ordinal = 1), cancellable = true)
 	public void bbb(Level w, Player p, InteractionHand hand, CallbackInfoReturnable<InteractionResultHolder<ItemStack>> ci) {
 		FFluidStatic.onBottleUse(w, p, hand, ci, p.getItemInHand(hand));
 	}
