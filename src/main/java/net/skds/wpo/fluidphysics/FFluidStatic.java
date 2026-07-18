@@ -280,7 +280,7 @@ public class FFluidStatic {
 		boolean belowSide1IsFluid = isSameFluid(side1Pos.below(), fluid, bg);
 		boolean belowSide2IsFluid = isSameFluid(side2Pos.below(), fluid, bg);
 		boolean cornerIsFluid = isSameFluid(cornerPos, fluid, bg);
-		boolean belowCornerIsFluid = isSameFluid(cornerPos, fluid, bg);
+		boolean belowCornerIsFluid = isSameFluid(cornerPos.below(), fluid, bg);
 		/* connections: both have fluid and can flow between */
 		boolean centerConnectUp = canReachAndSameFluid(centerPos, centerPos.above(), fluid, bg);
 		boolean centerConnectSide1 = centerCanReachSide1 && side1IsFluid;
