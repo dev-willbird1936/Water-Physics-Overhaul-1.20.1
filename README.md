@@ -1,119 +1,115 @@
 # Water Physics Overhaul
 
-This repository currently targets Forge 1.20.1 on the active branch.
+[![Latest release](https://img.shields.io/github/v/release/dev-willbird1936/Water-Physics-Overhaul?include_prereleases)](https://github.com/dev-willbird1936/Water-Physics-Overhaul/releases)
+![Minecraft 1.21.1](https://img.shields.io/badge/Minecraft-1.21.1-62B47A)
+![Loader: NeoForge](https://img.shields.io/badge/loader-NeoForge-EF6C00)
 
-## What It Is
+Finite-water simulation for Minecraft that makes water move, equalize, slide downhill, and settle according to nearby terrain and configurable simulation limits.
 
-Water Physics Overhaul replaces the normal lightweight vanilla water behavior with a heavier finite-water simulation layer.
+The current main line targets **Minecraft 1.21.1 with NeoForge**. A maintained **Minecraft 1.20.1 Forge** build is also available.
 
-At a high level, the mod adds:
+## Compatibility
 
-- level-based surface water storage
-- water equalization across nearby spaces
-- downhill sliding behavior to reach lower terrain
-- custom interaction reach for bucket pickup logic
-- an advanced bucket item
-- integration hooks used by the two add-on mods in this workspace
+| Minecraft | Loader | Source line | Status |
+| --- | --- | --- | --- |
+| 1.21.1 | NeoForge 21.1.227 or later | `main` | Current alpha line |
+| 1.20.1 | Forge 47.4.16 or later | `mc/1.20.1` | Maintained alpha line |
 
-This repository is the main gameplay mod in the workspace. The other two WPO add-ons extend it rather than replacing it.
+Use matching Minecraft, loader, Water Physics Overhaul, and SKDS Core versions. Alpha releases can contain incomplete behavior and compatibility problems.
 
-## Core Simulation Direction
+## Features
 
-The 1.20.1 port keeps the original WPO idea of treating water as a more physical finite system instead of letting it behave like ordinary vanilla source-spread water.
+- finite, level-based surface water storage
+- equalization across nearby spaces
+- downhill sliding toward lower terrain
+- configurable equalization, sliding, and bucket reach distances
+- advanced bucket item
+- chunk-level fluid data
+- custom water interaction helpers
+- integration hooks for the WPO add-on mods
+- block-state integration for representative waterloggable blocks
 
-The current port includes systems and code paths for:
+Unlike normal vanilla source spreading, the simulation moves and settles finite water amounts according to nearby state and configured limits.
 
-- chunk-level fluid data storage
-- finite water amounts with a max fluid level of `8`
-- equalization distance controls
-- sliding distance controls
-- custom fluid interaction helpers used by the add-ons
-- block-state injection for representative waterloggable blocks
+## Install
 
-In practice, this means the mod tries to move and settle water based on nearby state and configured simulation limits instead of relying only on vanilla fluid updates.
+1. Install the loader that matches your Minecraft version.
+2. Download the matching Water Physics Overhaul JAR from [Releases](https://github.com/dev-willbird1936/Water-Physics-Overhaul/releases).
+3. Download the matching [`SKDS-Core`](https://github.com/dev-willbird1936/SKDS-Core) dependency.
+4. Put both JAR files in the Minecraft `mods` folder.
+5. Start the game and verify both mods in the Mods screen.
 
 ## Configuration
 
-The common config is stored at:
+The common configuration file is:
 
 ```text
 config/wpo/common.toml
 ```
 
-The in-game config screen exposes the main tuning values:
+The in-game configuration screen exposes:
 
 - `performancePreset`
 - `setMaxEqualizeDistance`
 - `setMaxSlidingDistance`
 - `setMaxBucketDistance`
 
-The performance preset controls how aggressive the simulation can be, while `CUSTOM` unlocks manual equalize and slide distances.
-
-## Included Content
-
-The base mod currently includes:
-
-- the `Advanced Bucket`
-- the water simulation itself
-- entity, block-state, and packet hooks needed by the simulation
-
-Most additional placeable utility blocks live in the add-on mods rather than this base repository.
+The performance preset controls simulation aggressiveness. `CUSTOM` unlocks manual equalization and sliding distances.
 
 ## Add-ons
 
-Two original add-on mods are available for the 1.20.1 port:
+Two original add-on mods extend the base simulation:
 
-- `WPO Environmental Expansion` adds rain collection, puddles, evaporation, absorption, drought, seasonal effects, and biome-aware environmental behavior.
-- `WPO Hydraulic Utilities` adds pumps, drains, nozzles, valves, grates, watertight doors, watertight trapdoors, and creative fluid sources.
+- [`WPO Environmental Expansion`](https://github.com/dev-willbird1936/WPO-Environmental-Expansion) adds rain collection, puddles, evaporation, absorption, drought, seasonal effects, and biome-aware environmental behavior.
+- [`WPO Hydraulic Utilities`](https://github.com/dev-willbird1936/WPO-Hydraulic-Utilities) adds pumps, drains, nozzles, valves, grates, watertight doors, watertight trapdoors, and creative fluid sources.
 
-For external fluid transport with the add-ons, Pipez is the recommended companion pipe mod.
+For external fluid transport, Pipez is the recommended companion pipe mod.
 
-## Dependencies And Layout
+## Build From Source
 
-For local source builds, clone `SKDS-Core` next to this repository so the folder layout is:
+Clone [`SKDS-Core`](https://github.com/dev-willbird1936/SKDS-Core) next to this repository:
 
 ```text
 ../SKDS-Core
 ../Water-Physics-Overhaul
 ```
 
-## Credits
-
-- Original Water Physics Overhaul: `Sasai_Kudasai_BM`
-- 1.18.2 work used in the porting path: `Felicis`
-- 1.20.1 port and repository maintenance: [`dev-willbird1936`](https://github.com/dev-willbird1936)
-
-## Related Repositories
-
-- [`SKDS-Core`](https://github.com/dev-willbird1936/SKDS-Core)
-- [`WPO-Environmental-Expansion`](https://github.com/dev-willbird1936/WPO-Environmental-Expansion)
-- [`WPO-Hydraulic-Utilities`](https://github.com/dev-willbird1936/WPO-Hydraulic-Utilities)
-
-## Build
-
-Typical local build:
+For Minecraft 1.21.1 NeoForge, use `main` in both repositories:
 
 ```powershell
+git switch main
+git -C ..\SKDS-Core switch main
 .\gradlew.bat build
 ```
 
-Explicit version build:
+For Minecraft 1.20.1 Forge, use `mc/1.20.1` in both repositories:
 
 ```powershell
-.\gradlew.bat build -PmcVersion=1.20.1
+git switch mc/1.20.1
+git -C ..\SKDS-Core switch mc/1.20.1
+.\gradlew.bat build
 ```
 
-Stage the release jar into the workspace release folder:
+Stage a release JAR:
 
 ```powershell
-.\gradlew.bat stageRelease -PmcVersion=1.20.1
+.\gradlew.bat stageRelease
 ```
 
-Version-specific Minecraft and release values now live in `versions/<mcVersion>.properties`. Keep using version tags such as `v1.20.1-<mod-version>`, and use a branch like `mc/1.21.1` when a newer Minecraft version needs source-level divergence.
+Version-specific values live in `versions/<mcVersion>.properties`, but source-divergent loader lines still require their matching branches.
 
 ## Version Strategy
 
-- Stable repository name, without the Minecraft version in the repo title
-- `main` for the current maintained line
-- `mc/<minecraft-version>` branches when code starts to diverge between game versions
-- release tags in the form `v<minecraft-version>-<mod-version>`
+- `main` contains the current 1.21.1 NeoForge line.
+- `mc/1.20.1` contains the maintained 1.20.1 Forge line.
+- `versions/<minecraft-version>.properties` stores version-specific dependency and release values.
+- `mc/<minecraft-version>` branches are used when loader or source code diverges.
+- release tags use `v<minecraft-version>-<mod-version>`.
+
+## Credits and License
+
+- Original Water Physics Overhaul: `Sasai_Kudasai_BM`
+- 1.18.2 work used during the port: `Felicis`
+- 1.20.1 Forge and 1.21.1 NeoForge port maintenance: [`dev-willbird1936`](https://github.com/dev-willbird1936)
+
+The mod metadata declares **All Rights Reserved**.
